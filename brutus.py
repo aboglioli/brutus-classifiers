@@ -23,13 +23,28 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, Gradien
 from utils import merge, merge_args, compact_obj
 from score import Scorer
 
-# Load data
-data = pd.read_csv('../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
+#
+# Load data and pre-process
+#
 
-# Pre-process
+# Case 1
+# data = pd.read_csv('../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
+
+# data = data.drop(['id'], axis=1)
+# X = data.iloc[:, 0:5]
+# y = data.iloc[:, 5:6]
+# X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.3, random_state=0)
+
+# Case 2
+data = pd.read_csv('../2_Muerte_Coronaria/data/datos_train_test_sh.csv', delimiter=',', decimal='.')
+
 data = data.drop(['id'], axis=1)
-X = data.iloc[:,0:5]
-y = data.iloc[:, 5:6]
+X = data.iloc[:, 0:9]
+y = data.iloc[:, 9:10]
+
+X.famhist[X.famhist == 'Present'] = 1
+X.famhist[X.famhist == 'Absent'] = 0
+
 X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.3, random_state=0)
 
 #
@@ -50,7 +65,7 @@ variants = [
                 [{1: 0.2}, {1: 0.4}, {1: 0.6}, {1: 0.6}, {1: 0.8}],
             ])),
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': RandomForestClassifier,
@@ -59,7 +74,7 @@ variants = [
             'n_estimators': [2, 4, 5, 6, 8],
             'max_depth': [2, 5, 8, 10, 12, 14],
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': KNeighborsClassifier,
@@ -70,7 +85,7 @@ variants = [
             'leaf_size': [10, 20, 30, 50],
             'p': [1, 2, 3, 4, 5],
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': GaussianProcessClassifier,
@@ -88,12 +103,12 @@ variants = [
             'loss': ['deviance', 'exponential'],
             'learning_rate': [0.1, 0.3, 0.7, 0.9, 1.2, 1.5],
             'n_estimators': [50, 100, 150, 200],
-            'subsample': [0.3, 0.5, 0.8, 1.0, 1.2, 1.5],
+            'subsample': [0.3, 0.5, 0.8, 1.0],
             'criterion': ['friedman_mse', 'mse', 'mae'],
             'max_features': ['auto', 'sqrt', 'log2'],
             'max_depth': [1, 3, 5],
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': LogisticRegression,
@@ -120,7 +135,7 @@ for variant in variants:
             print('{}: {}/{} variants - {}'.format(variant['classifier'].__name__, i+1, len(vargs), args), end='\r')
             result = scorer.score(variant['classifier'], args)
             results.append(result)
-        print('---')
+        print()
 
 # VotingClassifier
 best_accuracy = GradientBoostingClassifier(loss='deviance', n_estimators=130, subsample=1.0, criterion='friedman_mse')
