@@ -34,14 +34,23 @@ knc_1 = KNeighborsClassifier(n_neighbors=2, leaf_size=10, algorithm='ball_tree',
 knc_2 = KNeighborsClassifier(n_neighbors=2, leaf_size=30, algorithm='kd_tree', weights='uniform') # 0.90787
 gbc = GradientBoostingClassifier(loss='deviance', n_estimators=100, subsample=0.8, criterion='mse') # 0.903
 rfc = RandomForestClassifier(max_leaf_nodes=50, n_estimators=4, max_depth=12) # 0.90199
+dtc = DecisionTreeClassifier(
+    criterion='entropy',
+    splitter='random',
+    max_depth=15, 
+    min_samples_split=6,
+    min_samples_leaf=3,
+    class_weight={0: 0.6, 1: 0.2},
+) # 0.91969
 
-estimators = [('1', knc), ('2', gbc)]
+# estimators = [('1', knc), ('2', gbc)]
 # model = ensemble.VotingClassifier(
 #     estimators=estimators,
 #     voting='soft',
 #     weights=[3, 1]
 # )
-model = rfc
+
+model = dtc
 model.fit(X, y.values.ravel())
 
 # Prediction

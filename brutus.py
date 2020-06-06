@@ -65,9 +65,10 @@ variants = [
         'classifier': KNeighborsClassifier,
         'vargs': {
             'n_neighbors': [2, 5, 10, 20, 30, 50, 100],
-            'leaf_size': [10, 20, 30, 50],
-            'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'],
             'weights': ['uniform', 'distance'],
+            'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'],
+            'leaf_size': [10, 20, 30, 50],
+            'p': [1, 2, 3, 4, 5],
         },
         'run': False,
     },
@@ -77,23 +78,27 @@ variants = [
             'kernel': [None],
             'n_restarts_optimizer': [0, 1, 2, 3],
             'max_iter_predict': [50, 100, 150],
+            'multi_class': ['one_vs_rest', 'one_vs_one'],
         },
-        'run': False,
+        'run': True,
     },
-    {
+    { # RUN THIS
         'classifier': GradientBoostingClassifier,
         'vargs': {
             'loss': ['deviance', 'exponential'],
-            'n_estimators': [20, 50, 80, 100, 130, 150, 180],
-            'subsample': [1.0, 0.8, 0.5, 0.3],
+            'learning_rate': [0.1, 0.3, 0.7, 0.9, 1.2, 1.5],
+            'n_estimators': [50, 100, 150, 200],
+            'subsample': [0.3, 0.5, 0.8, 1.0, 1.2, 1.5],
             'criterion': ['friedman_mse', 'mse', 'mae'],
+            'max_features': ['auto', 'sqrt', 'log2'],
+            'max_depth': [1, 3, 5],
         },
         'run': False,
     },
     {
         'classifier': LogisticRegression,
         'vargs': {
-            'penalty': ['l2', 'none'],
+            'penalty': ['l2'],
             'C': [0.2, 0.4, 0.6, 0.8, 1.0],
             'fit_intercept': [True, False],
             'class_weight': compact_obj(merge([
@@ -103,7 +108,7 @@ variants = [
             'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
             'l1_ratio': [0.2, 0.4, 0.6, 0.8],
         },
-        'run': True,
+        'run': False,
     },
 ]
 
