@@ -74,6 +74,7 @@ class Scorer():
             'CM': cm,
             'CP_1': category_precision[0],
             'CP_2': category_precision[1],
+            'CP_1 + CP_2': category_precision[0] + category_precision[1],
             'ROC': roc_auc,
             'KFold': kfold,
             'StratifiedKFold': skfold,

@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings('ignore')
 
-import pprint
+import sys
 
 import pandas as pd
 import numpy as np
@@ -20,7 +20,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier, StackingClassifier, RandomForestRegressor
 
-from utils import merge, merge_args
+from utils import merge, merge_args, compact_obj
 from score import Scorer
 
 # Load data
@@ -36,49 +36,86 @@ X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_s
 # Evaluation
 #
 scorer = Scorer(X, y, X_train, y_train, X_test, y_test)
+variants = [
+    {
+        'classifier': DecisionTreeClassifier,
+        'vargs': {
+            'criterion': ['gini', 'entropy'],
+            'splitter': ['best', 'random'],
+            'max_depth': [2, 5, 8, 10, 15, 20, 30, 50, 100, 150],
+            'min_samples_split': [2, 4, 6, 8, 10],
+            'min_samples_leaf': [1, 2, 3, 5, 10],
+            'class_weight': compact_obj(merge([
+                [{0: 0.2}, {0: 0.4}, {0: 0.6}, {0: 0.6}, {0: 0.8}],
+                [{1: 0.2}, {1: 0.4}, {1: 0.6}, {1: 0.6}, {1: 0.8}],
+            ])),
+        },
+        'run': False,
+    },
+    {
+        'classifier': RandomForestClassifier,
+        'vargs': {
+            'max_leaf_nodes': [35, 40, 45, 50],
+            'n_estimators': [2, 4, 5, 6, 8],
+            'max_depth': [2, 5, 8, 10, 12, 14],
+        },
+        'run': False,
+    },
+    {
+        'classifier': KNeighborsClassifier,
+        'vargs': {
+            'n_neighbors': [2, 5, 10, 20, 30, 50, 100],
+            'leaf_size': [10, 20, 30, 50],
+            'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'],
+            'weights': ['uniform', 'distance'],
+        },
+        'run': False,
+    },
+    {
+        'classifier': GaussianProcessClassifier,
+        'vargs': {
+            'kernel': [None],
+            'n_restarts_optimizer': [0, 1, 2, 3],
+            'max_iter_predict': [50, 100, 150],
+        },
+        'run': False,
+    },
+    {
+        'classifier': GradientBoostingClassifier,
+        'vargs': {
+            'loss': ['deviance', 'exponential'],
+            'n_estimators': [20, 50, 80, 100, 130, 150, 180],
+            'subsample': [1.0, 0.8, 0.5, 0.3],
+            'criterion': ['friedman_mse', 'mse', 'mae'],
+        },
+        'run': False,
+    },
+    {
+        'classifier': LogisticRegression,
+        'vargs': {
+            'penalty': ['l2', 'none'],
+            'C': [0.2, 0.4, 0.6, 0.8, 1.0],
+            'fit_intercept': [True, False],
+            'class_weight': compact_obj(merge([
+                [{0: 0.2}, {0: 0.4}, {0: 0.6}, {0: 0.6}, {0: 0.8}],
+                [{1: 0.2}, {1: 0.4}, {1: 0.6}, {1: 0.6}, {1: 0.8}],
+            ])),
+            'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
+            'l1_ratio': [0.2, 0.4, 0.6, 0.8],
+        },
+        'run': True,
+    },
+]
+
 results = []
-
-# RandomForestClassifier
-vargs = {
-    'max_leaf_nodes': [35, 40, 45, 50],
-    'n_estimators': [2, 4, 5, 6, 8],
-    'max_depth': [2, 5, 8, 10, 12, 14],
-}
-# for args in merge_args(vargs):
-#     result = scorer.score(RandomForestClassifier, args)
-#     results.append(result)
-
-# KNeighborsClassifier
-vargs = {
-    'n_neighbors': [2, 5, 10, 20, 30, 50, 100],
-    'leaf_size': [10, 20, 30, 50],
-    'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'],
-    'weights': ['uniform', 'distance'],
-}
-# for args in merge_args(vargs):
-#     result = scorer.score(KNeighborsClassifier, args)
-#     results.append(result)
-
-# GaussianProcessClassifier
-vargs = {
-    'kernel': [None],
-    'n_restarts_optimizer': [0, 1, 2, 3],
-    'max_iter_predict': [50, 100, 150],
-}
-# for args in merge_args(vargs):
-#     result = scorer.score(GaussianProcessClassifier, args)
-#     results.append(result)
-
-# GradientBoostingClassifier
-vargs = {
-    'loss': ['deviance', 'exponential'],
-    'n_estimators': [20, 50, 80, 100, 130, 150, 180],
-    'subsample': [1.0, 0.8, 0.5, 0.3],
-    'criterion': ['friedman_mse', 'mse', 'mae'],
-}
-# for args in merge_args(vargs):
-#     result = scorer.score(GradientBoostingClassifier, args)
-#     results.append(result)
+for variant in variants:
+    if variant['run']:
+        vargs = merge_args(variant['vargs'])
+        for (i, args) in enumerate(vargs):
+            print('{}: {}/{} variants - {}'.format(variant['classifier'].__name__, i+1, len(vargs), args), end='\r')
+            result = scorer.score(variant['classifier'], args)
+            results.append(result)
+        print('---')
 
 # VotingClassifier
 best_accuracy = GradientBoostingClassifier(loss='deviance', n_estimators=130, subsample=1.0, criterion='friedman_mse')
@@ -100,16 +137,12 @@ vargs = {
     'weights': merge([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
 }
 
-print("Total:", len(merge_args(vargs)))
-i = 1
-for args in merge_args(vargs):
-    print(i)
-    result = scorer.score(VotingClassifier, args)
-    results.append(result)
-    i += 1
+# for args in merge_args(vargs):
+#     result = scorer.score(VotingClassifier, args)
+#     results.append(result)
 
 # Save
 df = pd.DataFrame(data=results)
-df = df.sort_values(by=['CP_1', 'CP_2'], ascending=False)
+df = df.sort_values(by=['CP_1 + CP_2'], ascending=False)
 df.to_csv('results.csv')
 print(df)
