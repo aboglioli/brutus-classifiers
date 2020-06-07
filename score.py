@@ -4,6 +4,7 @@ from sklearn import model_selection
 
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
@@ -21,7 +22,7 @@ class Scorer():
         self.X_test = X_test
         self.y_test = y_test
 
-    def score(self, Classifier, args):
+    def score(self, Classifier, args, simple=True):
         X = self.X
         y = self.y
         X_train = self.X_train
@@ -35,11 +36,8 @@ class Scorer():
         model.fit(X_train, y_train.values.ravel())
         y_pred = model.predict(X_test)
 
+        # CM
         cm = confusion_matrix(y_test, y_pred)
-
-        global_precision = np.sum(cm.diagonal()) / np.sum(cm)
-        global_error = 1 - global_precision
-
         category_precision = cm.diagonal() / np.sum(cm, axis=1)
 
         # ROC
@@ -48,12 +46,12 @@ class Scorer():
         roc_auc = auc(fpr, tpr)
 
         # KFold
-        kfold = model_selection.KFold(n_splits=10)
-        kfold = model_selection.cross_val_score(model, X, y, cv=kfold).mean()
+        # kfold = model_selection.KFold(n_splits=10)
+        # kfold = model_selection.cross_val_score(model, X, y, cv=kfold).mean()
 
         # Stratified KFold
-        skfold = model_selection.StratifiedKFold(n_splits=10)
-        skfold = model_selection.cross_val_score(model, X, y, cv=skfold, scoring='f1_macro').mean()
+        # skfold = model_selection.StratifiedKFold(n_splits=10)
+        # skfold = model_selection.cross_val_score(model, X, y, cv=skfold, scoring='f1_macro').mean()
 
         # LeaveOneOut
         # loo = model_selection.LeaveOneOut()
@@ -62,21 +60,17 @@ class Scorer():
         return  {
             'Name': model.__class__.__name__,
             'Parameters': '{}'.format(args),
-            'ScoreTrain': model.score(X_train, y_train.values.ravel()),
-            'ScoreTest': model.score(X_test, y_test.values.ravel()),
-            'Accuracy': accuracy_score(y_test, y_pred),
-            'Recall': recall_score(y_test, y_pred, average='macro'),
-            'Precision': precision_score(y_test, y_pred, average='macro'),
-            'F1': f1_score(y_test, y_pred, average='macro'),
-            'Kappa': cohen_kappa_score(y_test, y_pred),
-            'GlobalPrecision': global_precision,
-            'GlobalError': global_error,
+            # 'Accuracy': accuracy_score(y_test, y_pred),
+            'BalancedAccuracy': balanced_accuracy_score(y_test, y_pred),
+            # 'Recall': recall_score(y_test, y_pred, average='macro'),
+            # 'Precision': precision_score(y_test, y_pred, average='macro'),
+            # 'F1': f1_score(y_test, y_pred, average='macro'),
+            # 'Kappa': cohen_kappa_score(y_test, y_pred),
             'CM': cm,
             'CP_1': category_precision[0],
             'CP_2': category_precision[1],
-            'CP_1 + CP_2': category_precision[0] + category_precision[1],
             'ROC': roc_auc,
-            'KFold': kfold,
-            'StratifiedKFold': skfold,
+            # 'KFold': kfold,
+            # 'StratifiedKFold': skfold,
             # 'LeaveOneOut': loo,
         }
