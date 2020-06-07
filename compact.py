@@ -3,7 +3,7 @@ import pandas as pd
 
 # Configuration
 results_folder = 'results'
-case = 'c2'
+case = 'c1'
 omit_meta_classifiers = True
 
 print ('# Case:', case)
@@ -22,12 +22,12 @@ if omit_meta_classifiers:
     print('* Omitting meta classifiers *')
 
 print('\n[ Best BalancedAccuracy ]')
-best_BA = data.sort_values(by=['BalancedAccuracy', 'ROC'], ascending=False).iloc[0, :]
+best_BA = data.sort_values(by=['BalancedAccuracy'], ascending=False).iloc[0, :]
 print(best_BA)
 print('Parameters: ', best_BA.Parameters)
 
 print('\n[ Best ROC ]')
-best_ROC = data.sort_values(by=['ROC', 'BalancedAccuracy'], ascending=False).iloc[0, :]
+best_ROC = data.sort_values(by=['ROC'], ascending=False).iloc[0, :]
 print(best_ROC)
 print('Parameters: ', best_ROC.Parameters)
 

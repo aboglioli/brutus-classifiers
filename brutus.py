@@ -31,56 +31,55 @@ results_folder = 'results'
 # Load data and pre-process
 #
 # --- Case 1 ---
-# case = 'c1'
-# data = pd.read_csv('../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
-#
-# data = data.drop(['id'], axis=1)
-# X = data.iloc[:, 0:5]
-# y = data.iloc[:, 5:6]
-
-# --- Case 2 ---
-case = 'c2'
-data = pd.read_csv('../2_Muerte_Coronaria/data/datos_train_test_sh.csv', delimiter=',', decimal='.')
+case = 'c1'
+data = pd.read_csv('../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
 
 data = data.drop(['id'], axis=1)
-data.famhist[data.famhist == 'Present'] = 1
-data.famhist[data.famhist == 'Absent'] = 0
-data.famhist = data.famhist.astype('int')
+X = data.iloc[:, 0:5]
+y = data.iloc[:, 5:6]
 
-X = data.iloc[:, 0:9]
-y = data.iloc[:, 9:10]
-
-# Best classifiers
-clf1 = GradientBoostingClassifier(
-    random_state=0,
-    loss='exponential',
-    learning_rate=0.30000000000000004,
-    n_estimators=30,
-    subsample=0.30000000000000004,
-    criterion='friedman_mse',
-    max_features='auto',
-    max_depth=4,
-) # BA
-clf2 = GradientBoostingClassifier(
-    random_state=0,
-    loss='exponential',
-    learning_rate=0.5000000000000001,
-    n_estimators=170,
-    subsample=0.7000000000000001,
-    criterion='mae',
-    max_features='auto',
-    max_depth=5,
-) # ROC
-clf3 = GradientBoostingClassifier(
-    random_state=0,
-    loss='exponential',
-    learning_rate=0.5000000000000001,
-    n_estimators=150,
-    subsample=0.7000000000000001,
-    criterion='mae',
-    max_features='auto',
-    max_depth=5,
-) # ROC 2
+# --- Case 2 ---
+# case = 'c2'
+# data = pd.read_csv('../2_Muerte_Coronaria/data/datos_train_test_sh.csv', delimiter=',', decimal='.')
+#
+# data = data.drop(['id'], axis=1)
+# data.famhist[data.famhist == 'Present'] = 1
+# data.famhist[data.famhist == 'Absent'] = 0
+# data.famhist = data.famhist.astype('int')
+#
+# X = data.iloc[:, 0:9]
+# y = data.iloc[:, 9:10]
+#
+# # Best classifiers
+# clf1 = DecisionTreeClassifier(
+#     random_state=0,
+#     criterion='entropy',
+#     splitter='random',
+#     max_depth=None,
+#     min_samples_split=14,
+#     min_samples_leaf=1,
+#     class_weight={0: 0.3, 1: 0.9}
+# ) # BA
+# clf2 = GradientBoostingClassifier(
+#     random_state=0,
+#     loss='exponential',
+#     learning_rate=0.5,
+#     n_estimators=170,
+#     subsample=0.7,
+#     criterion='mae',
+#     max_features='auto',
+#     max_depth=5,
+# ) # ROC
+# clf3 = GradientBoostingClassifier(
+#     random_state=0,
+#     loss='exponential',
+#     learning_rate=0.5,
+#     n_estimators=150,
+#     subsample=0.7,
+#     criterion='mae',
+#     max_features='auto',
+#     max_depth=5,
+# ) # ROC 2
 
 #
 # Evaluation
@@ -99,8 +98,8 @@ variants = [
             'min_samples_split': list(range(2, 16, 2)), # | C2 => BA=2; ROC=14
             'min_samples_leaf': list(range(1, 6, 1)), # | C2 => BA=3; ROC=1
             'class_weight': merge_args({ # | C2 => BA=[0.2, 0.6]; ROC=[0.6, 0.6]
-                0: np.arange(0.1, 1.0, 0.1),
-                1: np.arange(0.1, 1.0, 0.1),
+                0: np.arange(0.1, 1.0, 0.15),
+                1: np.arange(0.1, 1.0, 0.15),
             }),
         },
         'run': True,
@@ -110,14 +109,14 @@ variants = [
         'vargs': {
             'random_state': [random_state],
             'criterion': ['gini', 'entropy'], # | C2 => BA=entropy; ROC=gini
-            'n_estimators': [10, 100, 150], # | C2 => BA=150; ROC=10
-            'max_depth': [None, 2, 4, 5, 7], # | C2 => BA=5; ROC=None
-            'min_samples_split': list(range(2, 16, 2)), # | C2 => BA=2; ROC=14
-            'min_samples_leaf': list(range(1, 5, 1)), # | C2 => BA=1; ROC=1
+            'n_estimators': [10, 50, 100, 150], # | C2 => BA=150; ROC=10
+            'max_depth': [None, 4, 5, 6], # | C2 => BA=5; ROC=None
+            'min_samples_split': list(range(2, 10, 2)), # | C2 => BA=2; ROC=14
+            'min_samples_leaf': list(range(1, 3, 1)), # | C2 => BA=1; ROC=1
             'max_features': ['auto'], # | C2 => BA=*; ROC=*
             'class_weight': merge_args({ # | C2 => BA=[0.2, 0.8]; ROC=[0.2, 0.6]
-                0: np.arange(0.1, 1.0, 0.1),
-                1: np.arange(0.1, 1.0, 0.1),
+                0: np.arange(0.1, 1.0, 0.15),
+                1: np.arange(0.1, 1.0, 0.15),
             }),
         },
         'run': True,
@@ -127,9 +126,9 @@ variants = [
         'vargs': {
             'random_state': [random_state],
             'loss': ['deviance', 'exponential'], # | C2 => BA=exponential; ROC=exponential
-            'learning_rate': list(np.arange(0.1, 0.6, 0.1)), # | C2 => BA=0.3; ROC=0.5
+            'learning_rate': [0.1, 0.3, 0.5], # | C2 => BA=0.3; ROC=0.5
             'n_estimators': [10, 30, 50, 150, 170], # | C2 => BA=30; ROC=170
-            'subsample': list(np.arange(0.1, 0.8, 0.1)), # | C2 => BA=0.3; ROC=0.7
+            'subsample': [0.3, 0.5, 0.7, 1.0], # | C2 => BA=0.3; ROC=0.7
             'criterion': ['friedman_mse', 'mse', 'mae'], # | C2 => BA=friedman_mse; ROC=mae
             'max_features': ['auto', 'sqrt', 'log2'], # | C2 => BA=auto; ROC=auto
             'max_depth': list(range(3, 6, 1)), # | C2 => BA=4; ROC=5
@@ -137,32 +136,14 @@ variants = [
         'run': True,
     },
     {
-        'classifier': VotingClassifier,
-        'vargs': {
-            'estimators': merge([
-                [('1', clf1), ('1', clf2), ('1', clf3)],
-                [('2', clf1), ('2', clf2), ('2', clf3)],
-                [('3', clf1), ('3', clf2), ('3', clf3)],
-            ]),
-            'voting': ['soft'],
-            'weights': merge([
-                [1, 2, 3],
-                [1, 2, 3],
-                [1, 2, 3],
-            ]),
-        },
-        'run': False,
-    },
-    {
         'classifier': KNeighborsClassifier,
         'vargs': {
-            'n_neighbors': list(range(1, 15, 1)),
+            'n_neighbors': [2, 5, 10, 15],
             'weights': ['uniform', 'distance'],
             'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'],
-            'leaf_size': [2, 5, 10, 20, 30, 40, 50],
-            'p': list(range(1, 11, 1)),
+            'leaf_size': [10, 20, 30, 50, 60, 70],
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': xgb.XGBClassifier,
@@ -175,19 +156,33 @@ variants = [
             'n_estimators': [10, 30, 50, 80, 100],
             'base_score': [0.1, 0.3, 0.6, 0.8],
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': GaussianProcessClassifier,
         'vargs': {
             'random_state': [random_state],
-            'kernel': [None],
-            'n_restarts_optimizer': [0, 2],
-            'max_iter_predict': [10, 100],
-            'multi_class': ['one_vs_rest', 'one_vs_one'],
+            'kernel': [None, 1.0 * RBF(1.0)],
         },
-        'run': False,
+        'run': True,
     },
+    # {
+    #     'classifier': VotingClassifier,
+    #     'vargs': {
+    #         'estimators': merge([
+    #             [('1', clf1), ('1', clf2), ('1', clf3)],
+    #             [('2', clf1), ('2', clf2), ('2', clf3)],
+    #             [('3', clf1), ('3', clf2), ('3', clf3)],
+    #         ]),
+    #         'voting': ['soft'],
+    #         'weights': merge([
+    #             [1, 2, 3],
+    #             [1, 2, 3],
+    #             [1, 2, 3],
+    #         ]),
+    #     },
+    #     'run': False,
+    # },
 ]
 
 print('# BRUTE-FORCING:', case)
@@ -210,6 +205,6 @@ for variant in variants:
 
         df = pd.DataFrame(data=results)
 
-        df = df.sort_values(by=['BalancedAccuracy', 'ROC'], ascending=False)
+        df = df.sort_values(by=['BalancedAccuracy'], ascending=False)
         filename = '{}/{}/{}.csv'.format(results_folder, case, name)
         df.to_csv(filename)
