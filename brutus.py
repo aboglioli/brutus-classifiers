@@ -1,28 +1,24 @@
-import warnings
-warnings.filterwarnings('ignore')
-
 import sys
-
-import pandas as pd
+import warnings
 import numpy as np
+import pandas as pd
 
-from sklearn import model_selection
-
-# Classifiers
-from sklearn.neural_network import MLPClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC, LinearSVC
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier, StackingClassifier, RandomForestRegressor
-import xgboost as xgb
-
-from utils import merge, merge_args, compact_obj
 from score import Scorer
+from utils import merge, merge_args, compact_obj
+# Classifiers
+import xgboost as xgb
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier, StackingClassifier, RandomForestRegressor
+from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.svm import SVC, LinearSVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn import model_selection
+warnings.filterwarnings('ignore')
 
 random_state = 0
 results_folder = 'results'
@@ -32,7 +28,8 @@ results_folder = 'results'
 #
 # --- Case 1 ---
 case = 'c1'
-data = pd.read_csv('../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
+data = pd.read_csv(
+    '../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
 
 data = data.drop(['id'], axis=1)
 X = data.iloc[:, 0:5]
@@ -84,20 +81,23 @@ y = data.iloc[:, 5:6]
 #
 # Evaluation
 #
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.3, random_state=random_state)
+X_train, X_test, y_train, y_test = model_selection.train_test_split(
+    X, y, test_size=0.3, random_state=random_state)
 
 scorer = Scorer(X, y, X_train, y_train, X_test, y_test)
+scorer.split(test_size=0.3, random_state)
 variants = [
     {
         'classifier': DecisionTreeClassifier,
         'vargs': {
             'random_state': [random_state],
-            'criterion': ['gini', 'entropy'], # | C2 => BA=gini; ROC=entropy
-            'splitter': ['best', 'random'], # | C2 => BA=best; ROC=random
-            'max_depth': [None] + list(range(5, 20, 5)), # | C2 => BA=10; ROC=10
-            'min_samples_split': list(range(2, 16, 2)), # | C2 => BA=2; ROC=14
-            'min_samples_leaf': list(range(1, 6, 1)), # | C2 => BA=3; ROC=1
-            'class_weight': merge_args({ # | C2 => BA=[0.2, 0.6]; ROC=[0.6, 0.6]
+            'criterion': ['gini', 'entropy'],  # | C2 => BA=gini; ROC=entropy
+            'splitter': ['best', 'random'],  # | C2 => BA=best; ROC=random
+            # | C2 => BA=10; ROC=10
+            'max_depth': [None] + list(range(5, 20, 5)),
+            'min_samples_split': list(range(2, 16, 2)),  # | C2 => BA=2; ROC=14
+            'min_samples_leaf': list(range(1, 6, 1)),  # | C2 => BA=3; ROC=1
+            'class_weight': merge_args({  # | C2 => BA=[0.2, 0.6]; ROC=[0.6, 0.6]
                 0: np.arange(0.1, 1.0, 0.15),
                 1: np.arange(0.1, 1.0, 0.15),
             }),
@@ -108,13 +108,13 @@ variants = [
         'classifier': RandomForestClassifier,
         'vargs': {
             'random_state': [random_state],
-            'criterion': ['gini', 'entropy'], # | C2 => BA=entropy; ROC=gini
-            'n_estimators': [10, 50, 100, 150], # | C2 => BA=150; ROC=10
-            'max_depth': [None, 4, 5, 6], # | C2 => BA=5; ROC=None
-            'min_samples_split': list(range(2, 10, 2)), # | C2 => BA=2; ROC=14
-            'min_samples_leaf': list(range(1, 3, 1)), # | C2 => BA=1; ROC=1
-            'max_features': ['auto'], # | C2 => BA=*; ROC=*
-            'class_weight': merge_args({ # | C2 => BA=[0.2, 0.8]; ROC=[0.2, 0.6]
+            'criterion': ['gini', 'entropy'],  # | C2 => BA=entropy; ROC=gini
+            'n_estimators': [10, 50, 100, 150],  # | C2 => BA=150; ROC=10
+            'max_depth': [None, 4, 5, 6],  # | C2 => BA=5; ROC=None
+            'min_samples_split': list(range(2, 10, 2)),  # | C2 => BA=2; ROC=14
+            'min_samples_leaf': list(range(1, 3, 1)),  # | C2 => BA=1; ROC=1
+            'max_features': ['auto'],  # | C2 => BA=*; ROC=*
+            'class_weight': merge_args({  # | C2 => BA=[0.2, 0.8]; ROC=[0.2, 0.6]
                 0: np.arange(0.1, 1.0, 0.15),
                 1: np.arange(0.1, 1.0, 0.15),
             }),
@@ -125,13 +125,16 @@ variants = [
         'classifier': GradientBoostingClassifier,
         'vargs': {
             'random_state': [random_state],
-            'loss': ['deviance', 'exponential'], # | C2 => BA=exponential; ROC=exponential
-            'learning_rate': [0.1, 0.3, 0.5], # | C2 => BA=0.3; ROC=0.5
-            'n_estimators': [10, 30, 50, 150, 170], # | C2 => BA=30; ROC=170
-            'subsample': [0.3, 0.5, 0.7, 1.0], # | C2 => BA=0.3; ROC=0.7
-            'criterion': ['friedman_mse', 'mse', 'mae'], # | C2 => BA=friedman_mse; ROC=mae
-            'max_features': ['auto', 'sqrt', 'log2'], # | C2 => BA=auto; ROC=auto
-            'max_depth': list(range(3, 6, 1)), # | C2 => BA=4; ROC=5
+            # | C2 => BA=exponential; ROC=exponential
+            'loss': ['deviance', 'exponential'],
+            'learning_rate': [0.1, 0.3, 0.5],  # | C2 => BA=0.3; ROC=0.5
+            'n_estimators': [10, 30, 50, 150, 170],  # | C2 => BA=30; ROC=170
+            'subsample': [0.3, 0.5, 0.7, 1.0],  # | C2 => BA=0.3; ROC=0.7
+            # | C2 => BA=friedman_mse; ROC=mae
+            'criterion': ['friedman_mse', 'mse', 'mae'],
+            # | C2 => BA=auto; ROC=auto
+            'max_features': ['auto', 'sqrt', 'log2'],
+            'max_depth': list(range(3, 6, 1)),  # | C2 => BA=4; ROC=5
         },
         'run': True,
     },
@@ -189,7 +192,8 @@ print('# BRUTE-FORCING:', case)
 for variant in variants:
     if variant['run']:
         vargs = merge_args(variant['vargs'])
-        print('- {}: {} variants.'.format(variant['classifier'].__name__, len(vargs)))
+        print(
+            '- {}: {} variants.'.format(variant['classifier'].__name__, len(vargs)))
 
 print('\n# RUNNING')
 for variant in variants:

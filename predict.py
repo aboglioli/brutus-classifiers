@@ -1,33 +1,34 @@
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier, StackingClassifier, RandomForestRegressor
+from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.svm import SVC, LinearSVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+import numpy as np
+import pandas as pd
+import pprint
 import warnings
 warnings.filterwarnings('ignore')
 
-import pprint
-
-import pandas as pd
-import numpy as np
 
 # Classifiers
-from sklearn.neural_network import MLPClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC, LinearSVC
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier, StackingClassifier, RandomForestRegressor
 
 #
 # --- Case 1 ---
 #
 # Load data
-data = pd.read_csv('../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
-predict_data = pd.read_csv('../1_Calificacion_Crediticia/data/nuevas_instancias_scoring.csv', delimiter=';', decimal='.')
+data = pd.read_csv(
+    '../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
+predict_data = pd.read_csv(
+    '../1_Calificacion_Crediticia/data/nuevas_instancias_scoring.csv', delimiter=';', decimal='.')
 
 # Pre-process
 data = data.drop(['id'], axis=1)
-X = data.iloc[:,0:5]
+X = data.iloc[:, 0:5]
 y = data.iloc[:, 5:6]
 predict_data.index = predict_data.index + 1
 

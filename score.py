@@ -13,10 +13,15 @@ from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import roc_curve, auc
 
+
 class Scorer():
     def __init__(self, X, y, X_train, y_train, X_test, y_test):
         self.X = X
         self.y = y
+
+    def split(**args):
+        X_train, X_test, y_train, y_test = model_selection.train_test_split(
+            self.X, self.y, test_size=0.3, random_state=random_state)
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
@@ -57,7 +62,7 @@ class Scorer():
         # loo = model_selection.LeaveOneOut()
         # loo = model_selection.cross_val_score(model, X, y, cv=loo).mean()
 
-        return  {
+        return {
             'Name': model.__class__.__name__,
             'Parameters': '{}'.format(args),
             # 'Accuracy': accuracy_score(y_test, y_pred),

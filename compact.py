@@ -6,7 +6,7 @@ results_folder = 'results'
 case = 'c1'
 omit_meta_classifiers = True
 
-print ('# Case:', case)
+print('# Case:', case)
 
 dataframes = []
 for filename in glob('{}/{}/*.csv'.format(results_folder, case)):
