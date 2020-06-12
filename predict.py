@@ -18,9 +18,17 @@ import config
 from case import Credito, MuerteCoronaria
 
 case = Credito()
-model = DecisionTreeClassifier(random_state=0)
-res = case.predict(model)
+model = RandomForestClassifier(
+        random_state=0,
+        criterion='gini',
+        n_estimators=200,
+        min_samples_split=3,
+        min_samples_leaf=2,
+        max_features='auto',
+        class_weight={0: 0.7, 1: 0.4},
+)
 
+res = case.predict(model)
 res.to_csv('{}/{}_pred.csv'.format(config.results_folder, case.name), sep=',')
 
 
