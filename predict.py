@@ -15,13 +15,13 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import config
-from case import Case1, Case2
+from case import Credito, MuerteCoronaria
 
-case = Case1()
+case = Credito()
 model = DecisionTreeClassifier(random_state=0)
 res = case.predict(model)
 
-res.to_csv('{}/{}.csv'.format(config.predicted_folder, case.name), sep=',')
+res.to_csv('{}/{}_pred.csv'.format(config.results_folder, case.name), sep=',')
 
 
 # Classifiers

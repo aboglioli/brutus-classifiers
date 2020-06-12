@@ -1,9 +1,9 @@
 from glob import glob
 import pandas as pd
 import config
-from case import Case1, Case2
+from case import Credito, MuerteCoronaria
 
-case = Case1()
+case = Credito()
 
 print('# Case:', case.name)
 

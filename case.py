@@ -4,11 +4,11 @@ import config
 
 
 class Case():
-    def __init__(self, name, dataset_file):
-        self.name = name
+    def __init__(self, dataset_file):
+        self.name = self.__class__.__name__
         self.dataset_file = dataset_file
 
-        Path('{}/{}'.format(config.results_folder, name)).mkdir(parents=True, exist_ok=True)
+        Path('{}/{}'.format(config.results_folder, self.name)).mkdir(parents=True, exist_ok=True)
         Path('predicted').mkdir(parents=True, exist_ok=True)
 
     def get_data(self):
@@ -20,9 +20,9 @@ class Case():
         return model.predict(predict_data)
 
 
-class Case1(Case):
+class Credito(Case):
     def __init__(self):
-        super().__init__('c1', '../1_Calificacion_Crediticia/data/scoring_train_test.csv')
+        super().__init__('../1_Calificacion_Crediticia/data/scoring_train_test.csv')
 
     def get_data(self):
         data = pd.read_csv(self.dataset_file, delimiter=';', decimal='.')
@@ -49,9 +49,9 @@ class Case1(Case):
         return res
 
 
-class Case2(Case):
+class MuerteCoronaria(Case):
     def __init__(self):
-        super().__init__('c2', '../2_Muerte_Coronaria/data/datos_train_test_sh.csv')
+        super().__init__('../2_Muerte_Coronaria/data/datos_train_test_sh.csv')
 
     def get_data(self):
         data = pd.read_csv(self.dataset_file, delimiter=',', decimal='.')

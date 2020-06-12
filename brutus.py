@@ -3,12 +3,6 @@ import warnings
 import numpy as np
 import pandas as pd
 
-# Utils
-from score import Scorer
-from utils import merge, merge_args, compact_obj
-from case import Case1, Case2
-import config
-
 # Classifiers
 import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier, StackingClassifier, RandomForestRegressor
@@ -24,10 +18,16 @@ from sklearn.neural_network import MLPClassifier
 from sklearn import model_selection
 warnings.filterwarnings('ignore')
 
+# Utils
+from score import Scorer
+from utils import merge, merge_args, compact_obj
+from case import Credito, MuerteCoronaria
+import config
+
 random_state = 0
 
 # Load data and pre-process
-case = Case1()
+case = Credito()
 X, y = case.get_data()
 
 # Evaluation
@@ -86,10 +86,10 @@ variants = [
         'vargs': {
             'random_state': [random_state],
             'criterion': ['gini', 'entropy'],
-            'n_estimators': [50, 150],
+            'n_estimators': [50, 100, 150, 200],
             'max_depth': [None],
-            'min_samples_split': [2],
-            'min_samples_leaf': [1],
+            'min_samples_split': [2, 3],
+            'min_samples_leaf': [1, 2],
             'max_features': ['auto'],
             'class_weight': merge_args({
                 0: np.arange(0.1, 1.0, 0.3),
@@ -182,6 +182,6 @@ for variant in variants:
         print()
 
         df = pd.DataFrame(data=results)
-        df = df.sort_values(by=['BalancedAccuracy'], ascending=False)
+        df = df.sort_values(by=['StratifiedKFold'], ascending=False)
         filename = '{}/{}/{}.csv'.format(config.results_folder, case.name, name)
         df.to_csv(filename)
