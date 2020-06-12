@@ -8,14 +8,16 @@ class Case():
         self.name = name
         self.dataset_file = dataset_file
 
-        self.results_folder = '{}/{}'.format(config.results_folder, name)
-        self.predicted_folder = '{}/{}'.format(config.predicted_folder, name)
-
-        Path(self.results_folder).mkdir(parents=True, exist_ok=True)
-        Path(self.predicted_folder).mkdir(parents=True, exist_ok=True)
+        Path('{}/{}'.format(config.results_folder, name)).mkdir(parents=True, exist_ok=True)
+        Path('predicted').mkdir(parents=True, exist_ok=True)
 
     def get_data(self):
         pass
+
+    def predict(self, model, predict_data):
+        X, y = self.get_data()
+        model.fit(X, y.values.ravel())
+        return model.predict(predict_data)
 
 
 class Case1(Case):
@@ -33,6 +35,18 @@ class Case1(Case):
         self.y = y
 
         return (X, y)
+
+    def predict(self, model):
+        predict_data = pd.read_csv(
+            '../1_Calificacion_Crediticia/data/nuevas_instancias_scoring.csv', delimiter=';', decimal='.')
+        predict_data.index = predict_data.index + 1
+
+        y_pred = super().predict(model, predict_data)
+
+        res = pd.DataFrame(data=y_pred, columns=['Predict'])
+        res.index = res.index + 1
+        res.index.names = ['id']
+        return res
 
 
 class Case2(Case):
@@ -54,3 +68,21 @@ class Case2(Case):
         self.y = y
 
         return (X, y)
+
+    def predict(self, model):
+        predict_data = pd.read_csv(
+            '../2_Muerte_Coronaria/data/nuevas_instancias_a_predecir.csv', delimiter=';', decimal='.')
+        predict_data.index = predict_data.index + 1
+
+        predict_data = predict_data.drop(['id'], axis=1)
+        predict_data.famhist[predict_data.famhist == 'Present'] = 1
+        predict_data.famhist[predict_data.famhist == 'Absent'] = 0
+        predict_data.famhist = predict_data.famhist.astype('int')
+        predict_data.index = predict_data.index + 1
+
+        y_pred = super().predict(model, predict_data)
+
+        res = pd.DataFrame(data=y_pred, columns=['Predicted'])
+        res.index = res.index + 1
+        res.index.names = ['id']
+        return res

@@ -22,7 +22,6 @@ class Scorer():
     def split(self, **args):
         X_train, X_test, y_train, y_test = model_selection.train_test_split(
             self.X, self.y, **args)
-        print(X_test.head())
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test

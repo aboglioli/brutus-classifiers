@@ -25,7 +25,6 @@ from sklearn import model_selection
 warnings.filterwarnings('ignore')
 
 random_state = 0
-results_folder = 'results'
 
 # Load data and pre-process
 case = Case1()
@@ -184,5 +183,5 @@ for variant in variants:
 
         df = pd.DataFrame(data=results)
         df = df.sort_values(by=['BalancedAccuracy'], ascending=False)
-        filename = '{}/{}.csv'.format(case.results_folder, name)
+        filename = '{}/{}/{}.csv'.format(config.results_folder, case.name, name)
         df.to_csv(filename)

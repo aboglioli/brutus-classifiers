@@ -14,48 +14,56 @@ import pprint
 import warnings
 warnings.filterwarnings('ignore')
 
+import config
+from case import Case1, Case2
+
+case = Case1()
+model = DecisionTreeClassifier(random_state=0)
+res = case.predict(model)
+
+res.to_csv('{}/{}.csv'.format(config.predicted_folder, case.name), sep=',')
+
 
 # Classifiers
-
 #
 # --- Case 1 ---
 #
 # Load data
-data = pd.read_csv(
-    '../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
-predict_data = pd.read_csv(
-    '../1_Calificacion_Crediticia/data/nuevas_instancias_scoring.csv', delimiter=';', decimal='.')
-
-# Pre-process
-data = data.drop(['id'], axis=1)
-X = data.iloc[:, 0:5]
-y = data.iloc[:, 5:6]
-predict_data.index = predict_data.index + 1
-
-# Training
-model = RandomForestClassifier(
-    random_state=0,
-    criterion='entropy',
-    n_estimators=100,
-    max_depth=6,
-    min_samples_split=8,
-    min_samples_leaf=2,
-    max_features='auto',
-    class_weight={0: 0.7, 1: 0.1}
-)
-model.fit(X, y.values.ravel())
-
-# Results
-y_pred = model.predict(predict_data)
-res = pd.DataFrame(data=y_pred, columns=['Predict'])
-res.index = res.index + 1
-res.index.names = ['id']
-res.to_csv('predicted.csv', sep=',')
+# data = pd.read_csv(
+#     '../1_Calificacion_Crediticia/data/scoring_train_test.csv', delimiter=';', decimal='.')
+# predict_data = pd.read_csv(
+#     '../1_Calificacion_Crediticia/data/nuevas_instancias_scoring.csv', delimiter=';', decimal='.')
+#
+# # Pre-process
+# data = data.drop(['id'], axis=1)
+# X = data.iloc[:, 0:5]
+# y = data.iloc[:, 5:6]
+# predict_data.index = predict_data.index + 1
+#
+# # Training
+# model = RandomForestClassifier(
+#     random_state=0,
+#     criterion='entropy',
+#     n_estimators=100,
+#     max_depth=6,
+#     min_samples_split=8,
+#     min_samples_leaf=2,
+#     max_features='auto',
+#     class_weight={0: 0.7, 1: 0.1}
+# )
+# model.fit(X, y.values.ravel())
+#
+# # Results
+# y_pred = model.predict(predict_data)
+# res = pd.DataFrame(data=y_pred, columns=['Predict'])
+# res.index = res.index + 1
+# res.index.names = ['id']
+# res.to_csv('predicted.csv', sep=',')
 
 #
 # --- Case 2 ---
 #
-# # Load data
+# Load data
 # data = pd.read_csv('../2_Muerte_Coronaria/data/datos_train_test_sh.csv', delimiter=',', decimal='.')
 # predict_data = pd.read_csv('../2_Muerte_Coronaria/data/nuevas_instancias_a_predecir.csv', delimiter=';', decimal='.')
 #
