@@ -37,7 +37,7 @@ scorer.set_dataset(X, y)
 scorer.set_train_test(X_train, X_test, y_train, y_test)
 scorer.set_criteria([
     # 'CM',
-    # 'BalancedAccuracy',
+    'BalancedAccuracy',
     'Accuracy',
     # 'Recall',
     # 'Precision',
@@ -54,33 +54,32 @@ variants = [
         'classifier': DecisionTreeClassifier,
         'vargs': {
             'random_state': [random_state],
-            'criterion': ['gini'], # entropy
-            'splitter': ['best'], # random
-            'max_depth': [None] + list(range(10, 50, 5)),
-            'min_samples_split': list(range(2, 16, 2)),
-            'min_samples_leaf': list(range(1, 6, 1)),
+            'criterion': ['gini', 'entropy'],
+            'splitter': ['best', 'random'],
+            'max_depth': [None, 5, 10, 50],
+            'min_samples_split': list(range(2, 11, 2)),
+            'min_samples_leaf': [1, 3],
             'class_weight': merge_args({
-                0: list(range(1, 10, 1)),
-                1: list(range(1, 10, 1)),
+                0: list(range(1, 11, 1)),
+                1: list(range(1, 11, 1)),
             }),
         },
-        'run': False,
+        'run': True,
     },
     {
         'classifier': RandomForestClassifier,
         'vargs': {
             'random_state': [random_state],
-            'criterion': ['gini'], # entropy
-            'n_estimators': [2, 5, 8, 10, 20, 30, 50, 100], # list(range(10, 500, 20)),
-            'max_depth': [None], # + list(range(5, 50, 10)),
-            'min_samples_split': list(range(2, 15, 2)),
-            'min_samples_leaf': list(range(1, 10, 2)),
+            'criterion': ['gini', 'entropy'],
+            'n_estimators': [10, 20, 30, 50, 100, 150, 180], # list(range(10, 500, 20)),
+            'max_depth': [None, 5, 10, 50], # + list(range(5, 50, 10)),
+            'min_samples_split': list(range(2, 11, 2)),
+            'min_samples_leaf': [1, 3],
             'max_features': ['sqrt', 'log2'],
             'class_weight': merge_args({
                 0: list(range(1, 11, 1)),
                 1: list(range(1, 11, 1)),
             }),
-            # 'n_jobs': [-1],
         },
         'run': True,
     },
