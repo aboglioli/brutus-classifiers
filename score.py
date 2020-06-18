@@ -15,9 +15,15 @@ from sklearn.metrics import roc_curve, auc
 
 
 class Scorer():
-    def __init__(self, X, y):
+    def set_dataset(self, X, y):
         self.X = X
         self.y = y
+
+    def set_train_test(self, X_train, X_test, y_train, y_test):
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_test = X_test
+        self.y_test = y_test
 
     def split(self, **args):
         X_train, X_test, y_train, y_test = model_selection.train_test_split(
@@ -60,7 +66,7 @@ class Scorer():
             res['BalancedAccuracy'] = balanced_accuracy_score(y_test, y_pred)
 
         if 'Accuracy' in self.criteria:
-            res['Accuracy'] = accuracy_score(y_test, y_pred),
+            res['Accuracy'] = accuracy_score(y_test, y_pred)
 
         if 'Recall' in self.criteria:
             res['Recall'] = recall_score(y_test, y_pred, average='macro')

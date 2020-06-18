@@ -1,9 +1,9 @@
 from glob import glob
 import pandas as pd
 import config
-from case import Credito, MuerteCoronaria
+from case import Credito, MuerteCoronaria, Titanic
 
-case = Credito()
+case = Titanic()
 
 print('# Case:', case.name)
 
@@ -13,7 +13,7 @@ for filename in glob('{}/{}/*.csv'.format(config.results_folder, case.name)):
 
 data = pd.concat(dataframes)
 data = data.iloc[:, 1:]
-data = data.sort_values(by=['StratifiedKFold'], ascending=False)
+data = data.sort_values(by=['Accuracy'], ascending=False)
 
 data = data.iloc[:10000, :]
 save_file = '{}/{}.csv'.format(config.results_folder, case.name)
