@@ -178,7 +178,7 @@ class Titanic(Case):
 
     def get_data(self):
         train = pd.read_csv(self.dataset_file, index_col=0)
-        test = pd.read_csv('data/test_c.csv', index_col=0)
+        test = pd.read_csv('data/test.csv', index_col=0)
 
         data = train.append(test)
         data = self.map_data(data)
@@ -192,7 +192,7 @@ class Titanic(Case):
 
     def get_train_test(self):
         train = pd.read_csv(self.dataset_file, index_col=0)
-        test = pd.read_csv('data/test_c.csv', index_col=0)
+        test = pd.read_csv('data/test.csv', index_col=0)
 
         data = train.append(test)
         data = self.map_data(data)
@@ -206,7 +206,7 @@ class Titanic(Case):
 
     def predict(self, model):
         train = pd.read_csv(self.dataset_file, index_col=0)
-        test = pd.read_csv('data/test_c.csv', index_col=0)
+        test = pd.read_csv('data/test.csv', index_col=0)
 
         data = train.append(test)
         data = self.map_data(data)
