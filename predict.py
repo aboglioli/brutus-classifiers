@@ -87,15 +87,25 @@ case = Titanic()
 #         max_features='auto',
 #         class_weight={0: 3, 1: 2},
 # ) # 0.78468
+model = RandomForestClassifier(
+        random_state=0,
+        criterion='gini',
+        n_estimators=20,
+        max_depth=None,
+        min_samples_split=10,
+        min_samples_leaf=1,
+        max_features='log2',
+        class_weight={0: 6, 1: 7},
+) # 0.81339
 # model = RandomForestClassifier(
-#         random_state=0,
-#         criterion='gini',
-#         n_estimators=20,
-#         max_depth=None,
-#         min_samples_split=10,
-#         min_samples_leaf=1,
-#         max_features='log2',
-#         class_weight={0: 6, 1: 7},
-# ) # 0.81339
+#     random_state=0,
+#     criterion='entropy',
+#     n_estimators=30,
+#     max_depth=5,
+#     min_samples_split=4,
+#     min_samples_leaf=1,
+#     max_features='log2',
+#     class_weight={0: 6, 1: 4},
+# )
 res = case.predict(model)
 res.to_csv('{}/{}_pred.csv'.format(config.results_folder, case.name), sep=',')
